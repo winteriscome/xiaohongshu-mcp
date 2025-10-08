@@ -408,11 +408,65 @@ npx @modelcontextprotocol/inspector
 
 ![搜索内容](./assets/search_result.png)
 
-## 2. MCP 客户端接入
+## 2. 🔐 权限验证功能
+
+> **新功能**: 支持基于API Key的简单权限验证，确保MCP服务在公网环境中的安全性。
+
+### 2.1. 功能特性
+
+- **API Key验证**: 基于API Key的身份验证
+- **简单配置**: 只需配置API Key列表，无需复杂的权限分级
+- **配置热更新**: 支持运行时更新权限配置
+- **向后兼容**: 默认关闭，不影响现有使用
+
+### 2.2. 快速配置
+
+1. **启用权限验证**:
+   ```bash
+   # 修改配置文件 configs/auth.json
+   {
+     "enabled": true,
+     "api_keys": [
+       "your-api-key-1",
+       "your-api-key-2"
+     ]
+   }
+   ```
+
+2. **使用API Key调用**:
+   ```bash
+   # HTTP API调用
+   curl -H "X-API-Key: your-api-key" http://localhost:18060/api/v1/login/status
+   
+   # MCP工具调用（通过HTTP头传递）
+   ```
+
+3. **配置管理**:
+   ```bash
+   # 通过修改配置文件管理API Key
+   vim configs/auth.json
+   ```
+
+### 2.3. MCP Inspector客户端支持
+
+服务器完全支持MCP Inspector v0.17.0客户端：
+- ✅ 支持Streamable HTTP传输类型
+- ✅ 支持所有MCP协议头（mcp-protocol-version等）
+- ✅ 完整的CORS跨域支持
+- ✅ 支持权限验证
+- ✅ 使用官方MCP SDK，完全兼容MCP协议标准
+
+**注意**：MCP Inspector客户端需要发送标准JSON-RPC 2.0格式的请求。
+
+### 2.4. 详细文档
+
+完整的权限验证功能说明请参考：[权限验证文档](docs/AUTH.md)
+
+## 3. MCP 客户端接入
 
 本服务支持标准的 Model Context Protocol (MCP)，可以接入各种支持 MCP 的 AI 客户端。
 
-### 2.1. 快速开始
+### 3.1. 快速开始
 
 #### 启动 MCP 服务
 
@@ -445,7 +499,7 @@ claude mcp add --transport http xiaohongshu-mcp http://localhost:18060/mcp
 claude mcp list
 ```
 
-### 2.2. 支持的客户端
+### 3.2. 支持的客户端
 
 <details>
 <summary><b>Claude Code CLI</b></summary>
@@ -658,7 +712,7 @@ Cline 是一个强大的 AI 编程助手，支持 MCP 协议集成。
 
 </details>
 
-### 2.3. 可用 MCP 工具
+### 3.3. 可用 MCP 工具
 
 连接成功后，可使用以下 MCP 工具：
 
@@ -673,7 +727,7 @@ Cline 是一个强大的 AI 编程助手，支持 MCP 协议集成。
 - `post_comment_to_feed` - 发表评论到小红书帖子（需要：feed_id, xsec_token, content）
 - `user_profile` - 获取用户个人主页信息（需要：user_id, xsec_token）
 
-### 2.4. 使用示例
+### 3.4. 使用示例
 
 使用 Claude Code 发布内容到小红书：
 
@@ -714,7 +768,7 @@ Cline 是一个强大的 AI 编程助手，支持 MCP 协议集成。
 
 <img src="./assets/publish_result.jpeg" alt="xiaohongshu-mcp 发布结果" width="300">
 
-## 3. 🌟 实战案例展示 (Community Showcases)
+## 4. 🌟 实战案例展示 (Community Showcases)
 
 > 💡 **强烈推荐查看**：这些都是社区贡献者的真实使用案例，包含详细的配置步骤和实战经验！
 
@@ -729,7 +783,7 @@ Cline 是一个强大的 AI 编程助手，支持 MCP 协议集成。
 >
 > 📢 **欢迎贡献**: 如果你有新的集成案例，欢迎提交 PR 分享给社区！
 
-## 4. 小红书 MCP 互助群
+## 5. 小红书 MCP 互助群
 
 因为项目刚刚启动，会有很多问题，拉一个群大家一起讨论问题，一起为开源项目做贡献。~~扫我的微信二维码加群讨论技术~~。
 

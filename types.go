@@ -63,3 +63,17 @@ type UserProfileRequest struct {
 	UserID    string `json:"user_id" binding:"required"`
 	XsecToken string `json:"xsec_token" binding:"required"`
 }
+
+// 权限验证相关类型
+
+// AuthConfig 权限验证配置
+type AuthConfig struct {
+	Enabled bool     `json:"enabled"`  // 是否启用权限验证
+	APIKeys []string `json:"api_keys"` // 有效的API Key列表
+}
+
+// AuthContext 权限验证上下文
+type AuthContext struct {
+	APIKey  string `json:"api_key"`
+	IsValid bool   `json:"is_valid"`
+}

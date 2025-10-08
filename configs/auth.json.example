@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "api_keys": [
+    "default-key",
+    "your-api-key-1",
+    "your-api-key-2"
+  ]
+}

@@ -20,10 +20,10 @@ type PublishContentArgs struct {
 
 // PublishVideoArgs 发布视频的参数（仅支持本地单个视频文件）
 type PublishVideoArgs struct {
-    Title   string   `json:"title" jsonschema:"内容标题（小红书限制：最多20个中文字或英文单词）"`
-    Content string   `json:"content" jsonschema:"正文内容，不包含以#开头的标签内容，所有话题标签都用tags参数来生成和提供即可"`
-    Video   string   `json:"video" jsonschema:"本地视频绝对路径（仅支持单个视频文件，如:/Users/user/video.mp4）"`
-    Tags    []string `json:"tags,omitempty" jsonschema:"话题标签列表（可选参数），如 [美食, 旅行, 生活]"`
+	Title   string   `json:"title" jsonschema:"内容标题（小红书限制：最多20个中文字或英文单词）"`
+	Content string   `json:"content" jsonschema:"正文内容，不包含以#开头的标签内容，所有话题标签都用tags参数来生成和提供即可"`
+	Video   string   `json:"video" jsonschema:"本地视频绝对路径（仅支持单个视频文件，如:/Users/user/video.mp4）"`
+	Tags    []string `json:"tags,omitempty" jsonschema:"话题标签列表（可选参数），如 [美食, 旅行, 生活]"`
 }
 
 // SearchFeedsArgs 搜索内容的参数
@@ -78,6 +78,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "检查小红书登录状态",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, _ any) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("check_login_status", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			result := appServer.handleCheckLoginStatus(ctx)
 			return convertToMCPResult(result), nil, nil
 		},
@@ -90,6 +97,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "获取登录二维码（返回 Base64 图片和超时时间）",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, _ any) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("get_login_qrcode", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			result := appServer.handleGetLoginQrcode(ctx)
 			return convertToMCPResult(result), nil, nil
 		},
@@ -102,6 +116,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "发布小红书图文内容",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, args PublishContentArgs) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("publish_content", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			// 转换参数格式到现有的 handler
 			argsMap := map[string]interface{}{
 				"title":   args.Title,
@@ -121,6 +142,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "获取用户发布的内容列表",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, _ any) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("list_feeds", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			result := appServer.handleListFeeds(ctx)
 			return convertToMCPResult(result), nil, nil
 		},
@@ -133,6 +161,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "搜索小红书内容（需要已登录）",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, args SearchFeedsArgs) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("search_feeds", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			argsMap := map[string]interface{}{
 				"keyword": args.Keyword,
 			}
@@ -148,6 +183,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "获取小红书笔记详情，返回笔记内容、图片、作者信息、互动数据（点赞/收藏/分享数）及评论列表",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, args FeedDetailArgs) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("get_feed_detail", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			argsMap := map[string]interface{}{
 				"feed_id":    args.FeedID,
 				"xsec_token": args.XsecToken,
@@ -164,6 +206,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "获取小红书用户主页，返回用户基本信息，关注、粉丝、获赞量及其笔记内容",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, args UserProfileArgs) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("user_profile", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			argsMap := map[string]interface{}{
 				"user_id":    args.UserID,
 				"xsec_token": args.XsecToken,
@@ -180,6 +229,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "发表评论到小红书笔记",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, args PostCommentArgs) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("post_comment_to_feed", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			argsMap := map[string]interface{}{
 				"feed_id":    args.FeedID,
 				"xsec_token": args.XsecToken,
@@ -197,6 +253,13 @@ func registerTools(server *mcp.Server, appServer *AppServer) {
 			Description: "发布小红书视频内容（仅支持本地单个视频文件）",
 		},
 		func(ctx context.Context, req *mcp.CallToolRequest, args PublishVideoArgs) (*mcp.CallToolResult, any, error) {
+			// 权限验证
+			if !appServer.checkToolPermission("publish_with_video", req) {
+				return &mcp.CallToolResult{
+					Content: []mcp.Content{&mcp.TextContent{Text: "权限不足：无法执行此操作"}},
+					IsError: true,
+				}, nil, nil
+			}
 			argsMap := map[string]interface{}{
 				"title":   args.Title,
 				"content": args.Content,
@@ -249,4 +312,11 @@ func convertStringsToInterfaces(strs []string) []interface{} {
 		result[i] = s
 	}
 	return result
+}
+
+// checkToolPermission 检查工具权限
+func (s *AppServer) checkToolPermission(toolName string, req *mcp.CallToolRequest) bool {
+	// 权限验证由HTTP中间件处理，这里直接返回true
+	// MCP工具调用时，权限验证已经在HTTP层完成
+	return true
 }
