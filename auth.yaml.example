@@ -1,0 +1,15 @@
+# 权限验证配置文件示例
+# 复制此文件为 auth.yaml 并修改配置以启用权限验证
+
+# 是否启用权限验证
+# true: 启用，需要提供有效的 API Key
+# false: 禁用，所有请求都不需要验证
+enabled: true
+
+# API Key 列表
+# 可以配置多个 API Key，每行一个
+# 客户端需要在请求头中提供: Authorization: Bearer <api_key>
+api_keys:
+  - "your-secret-api-key-1"
+  - "your-secret-api-key-2"
+  - "your-secret-api-key-3"

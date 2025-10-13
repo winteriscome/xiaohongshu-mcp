@@ -24,6 +24,7 @@ func setupRoutes(appServer *AppServer) *gin.Engine {
 	router.GET("/health", healthHandler)
 
 	// MCP 端点 - 使用官方 SDK 的 Streamable HTTP Handler
+	// 使用自定义中间件：连接建立时不验证，工具调用时需要验证
 	mcpHandler := mcp.NewStreamableHTTPHandler(
 		func(r *http.Request) *mcp.Server {
 			return appServer.mcpServer
@@ -32,11 +33,12 @@ func setupRoutes(appServer *AppServer) *gin.Engine {
 			JSONResponse: true, // 支持 JSON 响应
 		},
 	)
-	router.Any("/mcp", gin.WrapH(mcpHandler))
-	router.Any("/mcp/*path", gin.WrapH(mcpHandler))
+	router.Any("/mcp", mcpAuthMiddleware(appServer), gin.WrapH(mcpHandler))
+	router.Any("/mcp/*path", mcpAuthMiddleware(appServer), gin.WrapH(mcpHandler))
 
-	// API 路由组
+	// API 路由组 - 应用权限验证中间件
 	api := router.Group("/api/v1")
+	api.Use(authMiddleware()) // Token-based 权限验证
 	{
 		api.GET("/login/status", appServer.checkLoginStatusHandler)
 		api.GET("/login/qrcode", appServer.getLoginQrcodeHandler)
